@@ -15,8 +15,8 @@ Future<void> init() async {
   sl.registerFactory(() => FeedBloc(getPosts: sl(), likePost: sl()));
 
   // Use cases
-  sl.registerLazySingleton(() => GetPosts());
-  sl.registerLazySingleton(() => LikePost());
+  sl.registerLazySingleton(() => GetPosts(sl()));
+  sl.registerLazySingleton(() => LikePost(sl()));
 
   // Repository
   sl.registerLazySingleton<FeedRepository>(
