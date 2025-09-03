@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_social_media/features/feed/domain/entities/post.dart';
+import 'package:mini_social_media/features/feed/presentation/pages/profile_page.dart';
 import 'package:mini_social_media/features/feed/presentation/widgets/video_player_widget.dart';
 
 import '../bloc/feed_bloc.dart';
@@ -34,7 +35,10 @@ class PostItem extends StatelessWidget {
               "${post.createdAt.hour}:${post.createdAt.minute} • ${post.createdAt.day}/${post.createdAt.month}",
             ),
             onTap: () {
-              // TODO: navigate to profile
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ProfilePage(user: post.user)),
+              );
             },
           ),
 
@@ -65,13 +69,12 @@ class PostItem extends StatelessWidget {
                       ),
                 ),
 
-
           // Actions row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
-   IconButton(
+                IconButton(
                   icon: Icon(
                     post.isLiked ? Icons.favorite : Icons.favorite_border,
                     color: post.isLiked ? Colors.red : null,
@@ -105,7 +108,6 @@ class PostItem extends StatelessWidget {
                   },
                 ),
                 Text("${post.comments.length}"),
-
               ],
             ),
           ),
