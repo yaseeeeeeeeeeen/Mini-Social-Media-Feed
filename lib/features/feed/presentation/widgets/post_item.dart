@@ -71,7 +71,7 @@ class PostItem extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
-                IconButton(
+   IconButton(
                   icon: Icon(
                     post.isLiked ? Icons.favorite : Icons.favorite_border,
                     color: post.isLiked ? Colors.red : null,
@@ -95,11 +95,17 @@ class PostItem extends StatelessWidget {
                           top: Radius.circular(20),
                         ),
                       ),
-                      builder: (_) => CommentSheet(postId: post.id),
+                      builder:
+                          (_) => BlocProvider.value(
+                            value:
+                                context.read<FeedBloc>(), // reuse the same bloc
+                            child: CommentSheet(postId: post.id),
+                          ),
                     );
                   },
                 ),
                 Text("${post.comments.length}"),
+
               ],
             ),
           ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mini_social_media/features/feed/domain/entities/comment.dart';
 
 import '../bloc/feed_bloc.dart';
 import '../bloc/feed_event.dart';
 import '../bloc/feed_state.dart';
+
 
 class CommentSheet extends StatefulWidget {
   final String postId;
@@ -15,6 +17,7 @@ class CommentSheet extends StatefulWidget {
 
 class _CommentSheetState extends State<CommentSheet> {
   final TextEditingController _controller = TextEditingController();
+  List<Comment> _comments = [];
 
   @override
   void initState() {
@@ -30,16 +33,30 @@ class _CommentSheetState extends State<CommentSheet> {
       maxChildSize: 0.95,
       minChildSize: 0.4,
       builder: (context, scrollController) {
-        return BlocBuilder<FeedBloc, FeedState>(
+        return BlocConsumer<FeedBloc, FeedState>(
+          listener: (context, state) {
+            if (state is CommentsLoaded && state.postId == widget.postId) {
+              setState(() {
+                _comments = state.comments;
+              });
+            } else if (state is CommentAddedSuccess) {
+              setState(() {
+                _comments.insert(0, state.comment);
+              });
+            }
+          },
           builder: (context, state) {
             return Container(
               padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
               child: Column(
                 children: [
+                  // Drag handle
                   Container(
                     height: 4,
                     width: 40,
@@ -49,31 +66,36 @@ class _CommentSheetState extends State<CommentSheet> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
+
+                  // Comments list
                   Expanded(
-                    child: ListView(
-                      controller: scrollController,
-                      children: [
-                        if (state is CommentsLoaded &&
-                            state.postId == widget.postId)
-                          ...state.comments.map(
-                            (c) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(c.user.avatarUrl),
-                              ),
-                              title: Text(
-                                c.user.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text(c.text),
+                    child:
+                        _comments.isEmpty
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.builder(
+                              controller: scrollController,
+                              itemCount: _comments.length,
+                              itemBuilder: (context, index) {
+                                final c = _comments[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      c.user.avatarUrl,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    c.user.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Text(c.text),
+                                );
+                              },
                             ),
-                          ),
-                        if (state is! CommentsLoaded)
-                          const Center(child: CircularProgressIndicator()),
-                      ],
-                    ),
                   ),
+
+                  // Input field
                   Row(
                     children: [
                       Expanded(
