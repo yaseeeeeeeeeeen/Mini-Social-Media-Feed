@@ -20,7 +20,7 @@ class FeedRemoteDataSourceImpl implements FeedRemoteDataSource {
 
   @override
   Future<List<Post>> getPosts(int page) async {
-    // Using jsonplaceholder for users, picsum for images
+    // Using jsonplaceholder for posts, users, and picsum/videos for media
     final response = await dio.get(
       'https://jsonplaceholder.typicode.com/posts?_page=$page&_limit=10',
     );
@@ -37,12 +37,18 @@ class FeedRemoteDataSourceImpl implements FeedRemoteDataSource {
         orElse: () => users[0],
       );
 
+      // 🔑 Every 5th post is a video
+      final isVideo = (json['id'] as int) % 5 == 0;
+
       return PostModel.fromJson({
         'id': json['id'],
         'user': {'id': user.id, 'name': user.name, 'avatar': user.avatarUrl},
         'content': json['body'],
-        'mediaUrl': 'https://picsum.photos/seed/${json['id']}/500/300',
-        'isVideo': false,
+        'mediaUrl':
+            isVideo
+                ? 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4'
+                : 'https://picsum.photos/seed/${json['id']}/500/300',
+        'isVideo': isVideo,
         'likes': (json['id'] as int) * 3,
         'isLiked': false,
         'comments': [],

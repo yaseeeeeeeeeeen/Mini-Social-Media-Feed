@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_social_media/features/feed/domain/entities/post.dart';
+import 'package:mini_social_media/features/feed/presentation/widgets/video_player_widget.dart';
 
 import '../bloc/feed_bloc.dart';
 import '../bloc/feed_event.dart';
@@ -47,20 +48,23 @@ class PostItem extends StatelessWidget {
               ),
             ),
 
-          // Media with shimmer
-          if (post.mediaUrl != null && !post.isVideo)
-            CachedNetworkImage(
-              imageUrl: post.mediaUrl!,
-              fit: BoxFit.cover,
-              placeholder:
-                  (context, url) => Container(
-                    height: 200,
-                    color: Colors.grey.shade300,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-            ),
+          // Media
+          if (post.mediaUrl != null)
+            post.isVideo
+                ? VideoPlayerWidget(url: post.mediaUrl!)
+                : CachedNetworkImage(
+                  imageUrl: post.mediaUrl!,
+                  fit: BoxFit.cover,
+                  placeholder:
+                      (context, url) => Container(
+                        height: 200,
+                        color: Colors.grey.shade300,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                ),
+
 
           // Actions row
           Padding(
