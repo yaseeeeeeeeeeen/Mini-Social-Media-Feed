@@ -27,11 +27,17 @@ class FeedRepositoryImpl implements FeedRepository {
     throw UnimplementedError();
   }
 
-  @override
-  Future<List<Post>> getPosts(int page) {
-    // TODO: implement getPosts
-    throw UnimplementedError();
+@override
+  Future<List<Post>> getPosts(int page) async {
+    try {
+      final posts = await remoteDataSource.getPosts(page);
+      await localDataSource.cachePosts(posts);
+      return posts;
+    } catch (e) {
+      return await localDataSource.getCachedPosts();
+    }
   }
+
 
   @override
   Future<Post> likePost(String postId) {
